@@ -1,0 +1,11 @@
+# Exclude learning guide (personal study material)
+LEARNING_GUIDE.md
+
+# Compiled executables
+*.exe
+*.out
+*.o
+
+# OS files
+.DS_Store
+Thumbs.db
