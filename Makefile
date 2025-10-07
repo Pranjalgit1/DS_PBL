@@ -12,7 +12,7 @@ all: cli
 
 # Build CLI version
 cli:
-	$(CC) $(CFLAGS) -o $(CLI_TARGET) dictionary.c main.c
+	$(CC) $(CFLAGS) -o $(CLI_TARGET) dictionary.c spellchecker.c main.c
 
 # Build GUI version (requires GTK3)
 gui:

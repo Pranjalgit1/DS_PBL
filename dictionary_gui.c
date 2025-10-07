@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "dictionary.h"
+#include "spellchecker.h"
 
 // Global variables
 static TrieNode *dictionary_root = NULL;
@@ -78,14 +79,31 @@ static void on_search_clicked(GtkWidget *widget, gpointer entry) {
         format_word_entry(word, result, output, sizeof(output));
         display_result(output);
     } else {
-        char output[256];
-        snprintf(output, sizeof(output), 
-                 "❌ Word '%s' not found in dictionary!\n\n"
-                 "💡 Suggestions:\n"
-                 "   • Check spelling\n"
-                 "   • Try lowercase\n"
-                 "   • Use 'Add Word' to add it\n"
-                 "   • Use 'Spell Check' for similar words", word);
+        // Run spellchecker
+        char suggestion_word[100];
+        char suggestion_meaning[200];
+        char *suggestion = get_spellcheck_suggestion((char*)word, "dictionary.txt", suggestion_word, suggestion_meaning);
+        
+        char output[512];
+        if (suggestion) {
+            snprintf(output, sizeof(output), 
+                     "❌ Word '%s' not found in dictionary!\n\n"
+                     "� Spell Checker Suggestion:\n\n"
+                     "Did you mean: %s?\n"
+                     "Meaning: %s\n\n"
+                     "💡 Other options:\n"
+                     "   • Check spelling\n"
+                     "   • Try lowercase\n"
+                     "   • Use 'Add Word' to add it", word, suggestion_word, suggestion_meaning);
+        } else {
+            snprintf(output, sizeof(output), 
+                     "❌ Word '%s' not found in dictionary!\n\n"
+                     "🔍 No spell check suggestions found.\n\n"
+                     "💡 Suggestions:\n"
+                     "   • Check spelling\n"
+                     "   • Try lowercase\n"
+                     "   • Use 'Add Word' to add it", word);
+        }
         display_result(output);
     }
     

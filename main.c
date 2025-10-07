@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "dictionary.h"
+#include "spellchecker.h"
 
 void display_menu(void) {
     printf("\n========================================\n");
@@ -59,6 +60,8 @@ int main(void) {
                         print_word_meanings(word, entry);
                     } else {
                         printf("\n❌ Word '%s' not found in dictionary.\n", word);
+                        printf("\n🔍 Running spell checker...\n");
+                        run_spellchecker(word, dict_file);
                     }
                 }
                 break;
