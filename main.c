@@ -49,19 +49,21 @@ int main(void) {
         getchar(); // Consume newline
         
         switch (choice) {
-            case 1: // Search for a word
-                printf("\nEnter word to search: ");
-                if (fgets(word, sizeof(word), stdin)) {
-                    word[strcspn(word, "\n")] = '\0'; // Remove newline
-                    
-                    WordEntry *entry = search_word(root, word);
-                    if (entry) {
-                        print_word_meanings(word, entry);
-                    } else {
-                        printf("\n❌ Word '%s' not found in dictionary.\n", word);
-                    }
-                }
-                break;
+   case 1: // Search for a word
+    printf("\nEnter word to search: ");
+    if (fgets(word, sizeof(word), stdin)) {
+        word[strcspn(word, "\n")] = '\0';
+        
+        WordEntry *entry = search_word(root, word);
+        if (entry) {
+            print_word_meanings(word, entry);
+        } else {
+            printf("\n❌ Word '%s' not found in dictionary.\n", word);
+            printf("\nSearching for similar words...\n");
+            run_spellchecker(word, dict_file);  // Call the spellchecker module
+        }
+    }
+    break;
                 
             case 2: // Insert a new word
                 printf("\nEnter new word: ");
