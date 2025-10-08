@@ -26,10 +26,10 @@ typedef struct TrieNode {
 
 TrieNode *create_trienode(void);
 void free_trie(TrieNode *root);
-bool insert_word(TrieNode *root, const char *word, const char *meaning);
-bool load_dictionary(TrieNode *root, const char *filename);
-bool save_dictionary(TrieNode *root, const char *filename);
-WordEntry *search_word(TrieNode *root, const char *word);
-void print_word_meanings(const char *word, WordEntry *entry);
+bool insert_word(TrieNode *root,  char *word,  char *meaning);
+bool load_dictionary(TrieNode *root,  char *filename);
+bool save_dictionary(TrieNode *root,  char *filename);
+WordEntry *search_word(TrieNode *root,  char *word);
+void print_word_meanings( char *word, WordEntry *entry);
 
 #endif

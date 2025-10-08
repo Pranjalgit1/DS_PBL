@@ -26,7 +26,7 @@ int main(void) {
         return 1;
     }
     
-    // Step 2: Load dictionary from file
+    // Step 2: Loading dictionary from file
     const char *dict_file = "dictionary.txt";
     printf("Loading dictionary from '%s'...\n", dict_file);
     if (!load_dictionary(root, dict_file)) {
@@ -53,14 +53,14 @@ int main(void) {
             case 1: // Search for a word
                 printf("\nEnter word to search: ");
                 if (fgets(word, sizeof(word), stdin)) {
-                    word[strcspn(word, "\n")] = '\0'; // Remove newline
+                    word[strcspn(word, "\n")] = '\0'; 
                     
                     WordEntry *entry = search_word(root, word);
                     if (entry) {
                         print_word_meanings(word, entry);
                     } else {
-                        printf("\n❌ Word '%s' not found in dictionary.\n", word);
-                        printf("\n🔍 Running spell checker...\n");
+                        printf("\n Word '%s' not found in dictionary\n", word);
+                        printf("\n Running spell checker...\n");
                         run_spellchecker(word, dict_file);
                     }
                 }
@@ -76,9 +76,9 @@ int main(void) {
                         meaning[strcspn(meaning, "\n")] = '\0';
                         
                         if (insert_word(root, word, meaning)) {
-                            printf("\n✓ Word '%s' inserted successfully!\n", word);
+                            printf("\n Word '%s' inserted successfully!\n", word);
                         } else {
-                            printf("\n❌ Failed to insert word.\n");
+                            printf("\n Failed to insert word.\n");
                         }
                     }
                 }
@@ -87,9 +87,9 @@ int main(void) {
             case 3: // Save dictionary
                 printf("\nSaving dictionary to '%s'...\n", dict_file);
                 if (save_dictionary(root, dict_file)) {
-                    printf("✓ Dictionary saved successfully!\n");
+                    printf("Dictionary saved successfully!\n");
                 } else {
-                    printf("❌ Failed to save dictionary.\n");
+                    printf("Failed to save dictionary.\n");
                 }
                 break;
                 
@@ -98,11 +98,11 @@ int main(void) {
                 save_dictionary(root, dict_file);
                 printf("\nCleaning up memory...\n");
                 free_trie(root);
-                printf("✓ Goodbye!\n\n");
+                printf("Goodbye!\n\n");
                 return 0;
                 
             default:
-                printf("\n❌ Invalid choice! Please select 1-4.\n");
+                printf("invalid choice please select 1-4.\n");
         }
     }
     

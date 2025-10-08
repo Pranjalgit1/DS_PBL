@@ -4,23 +4,21 @@
 #include <string.h>
 #include <ctype.h>
 
-/* ============================================================================
- * HELPER FUNCTIONS
- * ============================================================================ */
 
-/**
- * to_lowercase - Converts string to lowercase in-place
- */
+
+
+ // Converts string to lowercase in-place
+ 
 static void to_lowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         str[i] = tolower((unsigned char)str[i]);
     }
 }
 
-/**
- * create_meaning_node - Creates a new meaning node
- */
-static MeaningNode *create_meaning_node(const char *meaning) {
+
+ //create_meaning_node - Creates a new meaning node
+ 
+ MeaningNode *create_meaning_node( char *meaning) {
     MeaningNode *node = (MeaningNode *)malloc(sizeof(MeaningNode));
     if (!node) return NULL;
     
@@ -33,10 +31,10 @@ static MeaningNode *create_meaning_node(const char *meaning) {
     return node;
 }
 
-/**
- * add_meaning - Adds a meaning to a word entry
- */
-static bool add_meaning(WordEntry *entry, const char *meaning) {
+
+  //add_meaning - Adds a meaning to a word entry
+ 
+bool add_meaning(WordEntry *entry, char *meaning) {
     if (!entry || !meaning) return false;
     
     MeaningNode *new_node = create_meaning_node(meaning);
@@ -58,7 +56,7 @@ static bool add_meaning(WordEntry *entry, const char *meaning) {
 /**
  * free_meanings - Frees all meanings in a word entry
  */
-static void free_meanings(MeaningNode *head) {
+ void free_meanings(MeaningNode *head) {
     while (head) {
         MeaningNode *temp = head;
         head = head->next;
@@ -67,10 +65,10 @@ static void free_meanings(MeaningNode *head) {
     }
 }
 
-/**
- * trim_whitespace - Removes leading and trailing whitespace
- */
-static char *trim_whitespace(char *str) {
+
+ // Removes leading and trailing whitespace
+ 
+char *trim_whitespace(char *str) {
     // Trim leading
     while (isspace((unsigned char)*str)) str++;
     if (*str == 0) return str;
@@ -83,9 +81,9 @@ static char *trim_whitespace(char *str) {
     return str;
 }
 
-/* ============================================================================
- * CORE TRIE FUNCTIONS
- * ============================================================================ */
+
+ // CORE TRIE FUNCTIONS
+ 
 
 TrieNode *create_trienode(void) {
     TrieNode *node = (TrieNode *)malloc(sizeof(TrieNode));
@@ -120,7 +118,7 @@ void free_trie(TrieNode *root) {
     free(root);
 }
 
-bool insert_word(TrieNode *root, const char *word, const char *meaning) {
+bool insert_word(TrieNode *root, char *word, char *meaning) {
     if (!root || !word || !meaning) return false;
     
     // Convert word to lowercase for case-insensitive storage
@@ -131,13 +129,12 @@ bool insert_word(TrieNode *root, const char *word, const char *meaning) {
     
     TrieNode *curr = root;
     
-    // Traverse/create path for each character
+    // creating path for each character
     for (int i = 0; word_lower[i] != '\0'; i++) {
         if (!isalpha((unsigned char)word_lower[i])) {
             // Skip non-alphabetic characters
             continue;
         }
-        
         int index = word_lower[i] - 'a';
         if (index < 0 || index >= ALPHABET_SIZE) continue;
         
@@ -151,7 +148,7 @@ bool insert_word(TrieNode *root, const char *word, const char *meaning) {
     // Mark end of word
     curr->is_end_of_word = true;
     
-    // Create word entry if doesn't exist
+    // Create word entry if doesnt exist
     if (!curr->word_entry) {
         curr->word_entry = (WordEntry *)malloc(sizeof(WordEntry));
         if (!curr->word_entry) return false;
@@ -163,7 +160,7 @@ bool insert_word(TrieNode *root, const char *word, const char *meaning) {
     return add_meaning(curr->word_entry, meaning);
 }
 
-WordEntry *search_word(TrieNode *root, const char *word) {
+WordEntry *search_word(TrieNode *root, char *word) {
     if (!root || !word) return NULL;
     
     char word_lower[MAX_LINE_LENGTH];
@@ -191,7 +188,7 @@ WordEntry *search_word(TrieNode *root, const char *word) {
     return NULL;
 }
 
-void print_word_meanings(const char *word, WordEntry *entry) {
+void print_word_meanings( char *word, WordEntry *entry) {
     if (!entry) return;
     
     printf("\n--- Word: %s ---\n", word);
@@ -211,7 +208,7 @@ void print_word_meanings(const char *word, WordEntry *entry) {
  * FILE I/O FUNCTIONS
  * ============================================================================ */
 
-bool load_dictionary(TrieNode *root, const char *filename) {
+bool load_dictionary(TrieNode *root, char *filename) {
     if (!root || !filename) return false;
     
     FILE *file = fopen(filename, "r");
@@ -307,7 +304,7 @@ static void save_trie_helper(TrieNode *node, char *prefix, int level, FILE *file
     }
 }
 
-bool save_dictionary(TrieNode *root, const char *filename) {
+bool save_dictionary(TrieNode *root, char *filename) {
     if (!root || !filename) return false;
     
     FILE *file = fopen(filename, "w");
