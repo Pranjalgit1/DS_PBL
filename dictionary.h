@@ -2,6 +2,8 @@
 #define DICTIONARY_H
 #include <stdbool.h>
 #include <stddef.h>
+#include "heap.h"
+
 #define ALPHABET_SIZE 26
 #define MAX_LINE_LENGTH 1024
 #define MAX_MEANINGS 10
@@ -26,5 +28,9 @@ bool load_dictionary(TrieNode *root,  char *filename);
 bool save_dictionary(TrieNode *root,  char *filename);
 WordEntry *search_word(TrieNode *root,  char *word);
 void print_word_meanings( char *word, WordEntry *entry);
+
+// Heap integration functions
+void track_search(MaxHeap* heap, HashMap* map, const char* word);
+void display_top_searched(MaxHeap* heap, int n);
 
 #endif

@@ -1,7 +1,3 @@
-/*
- * dictionary_gui.c - GTK GUI for Advanced Dictionary System
- * Integrates with existing Trie data structure from dictionary.h/dictionary.c
- */
 
 #include <gtk/gtk.h>
 #include <string.h>
@@ -15,29 +11,18 @@ static GtkWidget *result_textview;
 static GtkTextBuffer *result_buffer;
 static GtkWidget *window;
 
-/* ============================================================================
- * HELPER FUNCTIONS
- * ============================================================================ */
 
-/**
- * display_result - Display text in result area
- */
 static void display_result(const char *text) {
     gtk_text_buffer_set_text(result_buffer, text, -1);
 }
 
-/**
- * append_result - Append text to result area
- */
+
 static void append_result(const char *text) {
     GtkTextIter end;
     gtk_text_buffer_get_end_iter(result_buffer, &end);
     gtk_text_buffer_insert(result_buffer, &end, text, -1);
 }
 
-/**
- * format_word_entry - Format word entry for display
- */
 static void format_word_entry(const char *word, WordEntry *entry, char *output, size_t size) {
     int len = snprintf(output, size, "\n📖 Word: %s\n", word);
     len += snprintf(output + len, size - len, "🔢 Search Count: %d\n", entry->search_count);
@@ -51,13 +36,7 @@ static void format_word_entry(const char *word, WordEntry *entry, char *output, 
     }
 }
 
-/* ============================================================================
- * BUTTON CALLBACK FUNCTIONS
- * ============================================================================ */
 
-/**
- * on_search_clicked - Handle search button click
- */
 static void on_search_clicked(GtkWidget *widget, gpointer entry) {
     const gchar *word = gtk_entry_get_text(GTK_ENTRY(entry));
     
@@ -111,9 +90,7 @@ static void on_search_clicked(GtkWidget *widget, gpointer entry) {
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 }
 
-/**
- * on_add_clicked - Handle add word button click
- */
+
 static void on_add_clicked(GtkWidget *widget, gpointer entry) {
     const gchar *word = gtk_entry_get_text(GTK_ENTRY(entry));
     
@@ -122,7 +99,7 @@ static void on_add_clicked(GtkWidget *widget, gpointer entry) {
         return;
     }
     
-    // Create dialog to get meaning
+    // Create dialog to get meanin
     GtkWidget *dialog = gtk_dialog_new_with_buttons(
         "Add Word Meaning",
         GTK_WINDOW(window),
@@ -167,9 +144,7 @@ static void on_add_clicked(GtkWidget *widget, gpointer entry) {
     gtk_widget_destroy(dialog);
 }
 
-/**
- * on_save_clicked - Handle save dictionary button click
- */
+
 static void on_save_clicked(GtkWidget *widget, gpointer data) {
     if (!dictionary_root) {
         display_result("❌ No dictionary to save!");
@@ -189,9 +164,7 @@ static void on_save_clicked(GtkWidget *widget, gpointer data) {
     }
 }
 
-/**
- * on_stats_clicked - Show dictionary statistics
- */
+
 static void on_stats_clicked(GtkWidget *widget, gpointer data) {
     display_result("📊 Dictionary Statistics\n\n"
                    "Loading statistics...\n"
@@ -202,16 +175,11 @@ static void on_stats_clicked(GtkWidget *widget, gpointer data) {
                    "💡 Search any word to see its statistics!");
 }
 
-/**
- * on_clear_clicked - Clear the result area
- */
 static void on_clear_clicked(GtkWidget *widget, gpointer data) {
     display_result("Ready to search...\n\nEnter a word above and click 🔍 Search");
 }
 
-/**
- * on_about_clicked - Show about dialog
- */
+
 static void on_about_clicked(GtkWidget *widget, gpointer data) {
     GtkWidget *dialog = gtk_message_dialog_new(
         GTK_WINDOW(window),
@@ -238,9 +206,6 @@ static void on_about_clicked(GtkWidget *widget, gpointer data) {
     gtk_widget_destroy(dialog);
 }
 
-/* ============================================================================
- * MAIN FUNCTION
- * ============================================================================ */
 
 int main(int argc, char *argv[]) {
     // Initialize GTK

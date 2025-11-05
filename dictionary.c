@@ -1,4 +1,5 @@
 #include "dictionary.h"
+#include "heap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -243,4 +244,18 @@ bool save_dictionary(TrieNode *root, char *filename) {
     fclose(file);
     printf("Dictionary saved to '%s'\n", filename);
     return true;
+}
+
+// Heap integration functions
+
+// Track a word search in the heap
+void track_search(MaxHeap* heap, HashMap* map, const char* word) {
+    if (!heap || !map || !word) return;
+    increase_freq(heap, map, word, 1);
+}
+
+// Display top N most searched words
+void display_top_searched(MaxHeap* heap, int n) {
+    if (!heap) return;
+    get_top_searched_words(heap, n);
 }

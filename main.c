@@ -3,6 +3,7 @@
 #include <string.h>
 #include "dictionary.h"
 #include "spellchecker.h"
+#include "heap.h"
 
 void display_menu(void) {
     printf("\n========================================\n");
@@ -10,8 +11,9 @@ void display_menu(void) {
     printf("========================================\n");
     printf("1. Search for a word\n");
     printf("2. Insert a new word\n");
-    printf("3. Save dictionary\n");
-    printf("4. Exit\n");
+    printf("3. View top searched words\n");
+    printf("4. Save dictionary\n");
+    printf("5. Exit\n");
     printf("========================================\n");
     printf("Enter your choice: ");
 }
@@ -24,6 +26,16 @@ int main(void) {
         fprintf(stderr, "Error: Failed to create Trie root\n");
         return 1;
     }
+    
+    // Create heap and hashmap for tracking search frequency
+    MaxHeap *search_heap = create_max_heap();
+    HashMap *search_map = create_hash_map();
+    if (!search_heap || !search_map) {
+        fprintf(stderr, "Error: Failed to create search tracking structures\n");
+        free_trie(root);
+        return 1;
+    }
+    
     //  Loading dictionary from file
     const char *dict_file = "dictionary.txt";
     printf("Loading dictionary from '%s'...\n", dict_file);
@@ -50,6 +62,8 @@ int main(void) {
                     WordEntry *entry = search_word(root, word);
                     if (entry) {
                         print_word_meanings(word, entry);
+                        // Track this search in the heap
+                        track_search(search_heap, search_map, word);
                     } else {
                         printf("\n Word '%s' not found in dictionary\n", word);
                         printf("\n Running spell checker...\n");
@@ -74,7 +88,22 @@ int main(void) {
                 }
                 break;
                 
-            case 3: // Save dictionary
+            case 3: // View top searched words
+                printf("\nHow many top words do you want to see? (1-20): ");
+                int n;
+                if (scanf("%d", &n) == 1) {
+                    getchar(); // consume newline
+                    if (n < 1) n = 5;
+                    if (n > 20) n = 20;
+                    display_top_searched(search_heap, n);
+                } else {
+                    getchar();
+                    printf("Invalid input! Showing top 5...\n");
+                    display_top_searched(search_heap, 5);
+                }
+                break;
+                
+            case 4: // Save dictionary
                 printf("\nSaving dictionary to '%s'...\n", dict_file);
                 if (save_dictionary(root, dict_file)) {
                     printf("Dictionary saved successfully!\n");
@@ -83,15 +112,17 @@ int main(void) {
                 }
                 break;
                 
-            case 4: // Exit
+            case 5: // Exit
                 printf("\nSaving dictionary before exit...\n");
                 save_dictionary(root, dict_file);
                 printf("\nCleaning up memory...\n");
                 free_trie(root);
+                free_max_heap(search_heap);
+                free_hash_map(search_map);
                 printf("Goodbye!\n\n");
                 return 0;
             default:
-                printf("invalid choice please select 1-4.\n");
+                printf("invalid choice please select 1-5.\n");
         }
     }
     
