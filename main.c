@@ -18,43 +18,35 @@ void display_menu(void) {
 
 int main(void) {
     printf("=== INITIALIZING DICTIONARY ===\n\n");
-    
-    // Step 1: Create root node of Trie
+    // Create root node of Trie
     TrieNode *root = create_trienode();
     if (!root) {
         fprintf(stderr, "Error: Failed to create Trie root\n");
         return 1;
     }
-    
-    // Step 2: Loading dictionary from file
+    //  Loading dictionary from file
     const char *dict_file = "dictionary.txt";
     printf("Loading dictionary from '%s'...\n", dict_file);
     if (!load_dictionary(root, dict_file)) {
         printf("Warning: Could not load dictionary file. Starting with empty dictionary.\n");
     }
-    
-    // Step 3: Interactive menu
+    // menu
     int choice;
     char word[MAX_LINE_LENGTH];
     char meaning[MAX_LINE_LENGTH];
-    
     while (1) {
         display_menu();
-        
         if (scanf("%d", &choice) != 1) {
-            // Clear invalid input
             while (getchar() != '\n');
             printf("Invalid input! Please enter a number.\n");
             continue;
         }
-        getchar(); // Consume newline
-        
+        getchar(); 
         switch (choice) {
             case 1: // Search for a word
                 printf("\nEnter word to search: ");
                 if (fgets(word, sizeof(word), stdin)) {
                     word[strcspn(word, "\n")] = '\0'; 
-                    
                     WordEntry *entry = search_word(root, word);
                     if (entry) {
                         print_word_meanings(word, entry);
@@ -70,11 +62,9 @@ int main(void) {
                 printf("\nEnter new word: ");
                 if (fgets(word, sizeof(word), stdin)) {
                     word[strcspn(word, "\n")] = '\0';
-                    
                     printf("Enter meaning: ");
                     if (fgets(meaning, sizeof(meaning), stdin)) {
                         meaning[strcspn(meaning, "\n")] = '\0';
-                        
                         if (insert_word(root, word, meaning)) {
                             printf("\n Word '%s' inserted successfully!\n", word);
                         } else {
@@ -100,7 +90,6 @@ int main(void) {
                 free_trie(root);
                 printf("Goodbye!\n\n");
                 return 0;
-                
             default:
                 printf("invalid choice please select 1-4.\n");
         }
