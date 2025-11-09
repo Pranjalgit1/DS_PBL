@@ -4,12 +4,14 @@
 #include <stdlib.h>
 #include "dictionary.h"
 #include "spellchecker.h"
+#include "autocomplete.h"
 
-// Global variables
 static TrieNode *dictionary_root = NULL;
 static GtkWidget *result_textview;
 static GtkTextBuffer *result_buffer;
 static GtkWidget *window;
+static GtkEntryCompletion *completion;
+static GtkListStore *completion_store;
 
 
 static void display_result(const char *text) {
@@ -37,6 +39,24 @@ static void format_word_entry(const char *word, WordEntry *entry, char *output, 
 }
 
 
+static void on_entry_changed(GtkEntry *entry, gpointer user_data) {
+    const gchar *text = gtk_entry_get_text(entry);
+    int len = strlen(text);
+    
+    gtk_list_store_clear(completion_store);
+    
+    if (len < 2 || !dictionary_root) return;
+    
+    char suggestions[MAX_SUGG][256];
+    int count = autocomplete_gui(dictionary_root, text, suggestions, MAX_SUGG);
+    
+    GtkTreeIter iter;
+    for (int i = 0; i < count; i++) {
+        gtk_list_store_append(completion_store, &iter);
+        gtk_list_store_set(completion_store, &iter, 0, suggestions[i], -1);
+    }
+}
+
 static void on_search_clicked(GtkWidget *widget, gpointer entry) {
     const gchar *word = gtk_entry_get_text(GTK_ENTRY(entry));
     
@@ -50,7 +70,6 @@ static void on_search_clicked(GtkWidget *widget, gpointer entry) {
         return;
     }
     
-    // Search in Trie
     WordEntry *result = search_word(dictionary_root, word);
     
     if (result) {
@@ -208,10 +227,10 @@ static void on_about_clicked(GtkWidget *widget, gpointer data) {
 
 
 int main(int argc, char *argv[]) {
-    // Initialize GTK
+   
     gtk_init(&argc, &argv);
     
-    // Initialize dictionary (load from file)
+  
     dictionary_root = create_trienode();
     if (!dictionary_root) {
         g_print("Error: Failed to create dictionary root!\n");
@@ -223,24 +242,23 @@ int main(int argc, char *argv[]) {
         g_print("Warning: Could not load dictionary file. Starting with empty dictionary.\n");
     }
     
-    // Create main window
+    
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Advanced Dictionary System - GUI");
     gtk_window_set_default_size(GTK_WINDOW(window), 700, 500);
     gtk_container_set_border_width(GTK_CONTAINER(window), 15);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     
-    // Create main vertical box
+
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(window), vbox);
-    
-    // Title label
+   
     GtkWidget *title_label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(title_label), 
                          "<span font='16' weight='bold'>📚 Advanced Dictionary System</span>");
     gtk_box_pack_start(GTK_BOX(vbox), title_label, FALSE, FALSE, 5);
     
-    // Search area (horizontal box)
+    
     GtkWidget *search_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(vbox), search_hbox, FALSE, FALSE, 0);
     
@@ -248,14 +266,26 @@ int main(int argc, char *argv[]) {
     GtkWidget *entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry), "Type a word here...");
     gtk_widget_set_size_request(entry, 300, -1);
+  
+    completion_store = gtk_list_store_new(1, G_TYPE_STRING);
+    completion = gtk_entry_completion_new();
+    gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(completion_store));
+    gtk_entry_completion_set_text_column(completion, 0);
+    gtk_entry_completion_set_minimum_key_length(completion, 2);
+    gtk_entry_completion_set_popup_completion(completion, TRUE);
+    gtk_entry_completion_set_inline_completion(completion, TRUE);
+    gtk_entry_set_completion(GTK_ENTRY(entry), completion);
     
-    // Make Enter key trigger search
+    
+    g_signal_connect(entry, "changed", G_CALLBACK(on_entry_changed), NULL);
+    
+    
     g_signal_connect(entry, "activate", G_CALLBACK(on_search_clicked), entry);
     
     gtk_box_pack_start(GTK_BOX(search_hbox), label, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(search_hbox), entry, TRUE, TRUE, 0);
     
-    // Button area (horizontal box)
+    
     GtkWidget *button_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_pack_start(GTK_BOX(vbox), button_hbox, FALSE, FALSE, 0);
     
@@ -273,7 +303,7 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(button_hbox), btn_clear, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(button_hbox), btn_about, TRUE, TRUE, 0);
     
-    // Result area (scrollable text view)
+
     GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -291,14 +321,14 @@ int main(int argc, char *argv[]) {
                              "Enter a word above and click 🔍 Search\n"
                              "or press Enter key.", -1);
     
-    // Set monospace font for better readability
+    
     PangoFontDescription *font_desc = pango_font_description_from_string("Monospace 11");
     gtk_widget_override_font(result_textview, font_desc);
     pango_font_description_free(font_desc);
     
     gtk_container_add(GTK_CONTAINER(scrolled_window), result_textview);
     
-    // Connect button signals
+    
     g_signal_connect(btn_search, "clicked", G_CALLBACK(on_search_clicked), entry);
     g_signal_connect(btn_add, "clicked", G_CALLBACK(on_add_clicked), entry);
     g_signal_connect(btn_save, "clicked", G_CALLBACK(on_save_clicked), NULL);
@@ -306,14 +336,23 @@ int main(int argc, char *argv[]) {
     g_signal_connect(btn_clear, "clicked", G_CALLBACK(on_clear_clicked), NULL);
     g_signal_connect(btn_about, "clicked", G_CALLBACK(on_about_clicked), NULL);
     
-    // Show all widgets
+    
     gtk_widget_show_all(window);
     
-    // Run GTK main loop
+ 
     gtk_main();
     
-    // Cleanup
+  
     g_print("\nCleaning up...\n");
+    
+    
+    if (completion_store) {
+        g_object_unref(completion_store);
+    }
+    if (completion) {
+        g_object_unref(completion);
+    }
+    
     if (dictionary_root) {
         free_trie(dictionary_root);
     }

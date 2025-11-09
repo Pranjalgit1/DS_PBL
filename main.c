@@ -20,14 +20,12 @@ void display_menu(void) {
 
 int main(void) {
     printf("=== INITIALIZING DICTIONARY ===\n\n");
-    // Create root node of Trie
     TrieNode *root = create_trienode();
     if (!root) {
         fprintf(stderr, "Error: Failed to create Trie root\n");
         return 1;
     }
     
-    // Create heap and hashmap for tracking search frequency
     MaxHeap *search_heap = create_max_heap();
     HashMap *search_map = create_hash_map();
     if (!search_heap || !search_map) {
@@ -36,13 +34,11 @@ int main(void) {
         return 1;
     }
     
-    //  Loading dictionary from file
     const char *dict_file = "dictionary.txt";
     printf("Loading dictionary from '%s'...\n", dict_file);
     if (!load_dictionary(root, dict_file)) {
         printf("Warning: Could not load dictionary file. Starting with empty dictionary.\n");
     }
-    // menu
     int choice;
     char word[MAX_LINE_LENGTH];
     char meaning[MAX_LINE_LENGTH];
@@ -55,14 +51,13 @@ int main(void) {
         }
         getchar(); 
         switch (choice) {
-            case 1: // Search for a word
+            case 1:
                 printf("\nEnter word to search: ");
                 if (fgets(word, sizeof(word), stdin)) {
                     word[strcspn(word, "\n")] = '\0'; 
                     WordEntry *entry = search_word(root, word);
                     if (entry) {
                         print_word_meanings(word, entry);
-                        // Track this search in the heap
                         track_search(search_heap, search_map, word);
                     } else {
                         printf("\n Word '%s' not found in dictionary\n", word);
@@ -72,7 +67,7 @@ int main(void) {
                 }
                 break;
                 
-            case 2: // Insert a new word
+            case 2:
                 printf("\nEnter new word: ");
                 if (fgets(word, sizeof(word), stdin)) {
                     word[strcspn(word, "\n")] = '\0';
@@ -88,11 +83,11 @@ int main(void) {
                 }
                 break;
                 
-            case 3: // View top searched words
+            case 3:
                 printf("\nHow many top words do you want to see? (1-20): ");
                 int n;
                 if (scanf("%d", &n) == 1) {
-                    getchar(); // consume newline
+                    getchar();
                     if (n < 1) n = 5;
                     if (n > 20) n = 20;
                     display_top_searched(search_heap, n);
@@ -103,7 +98,7 @@ int main(void) {
                 }
                 break;
                 
-            case 4: // Save dictionary
+            case 4:
                 printf("\nSaving dictionary to '%s'...\n", dict_file);
                 if (save_dictionary(root, dict_file)) {
                     printf("Dictionary saved successfully!\n");
@@ -112,7 +107,7 @@ int main(void) {
                 }
                 break;
                 
-            case 5: // Exit
+            case 5:
                 printf("\nSaving dictionary before exit...\n");
                 save_dictionary(root, dict_file);
                 printf("\nCleaning up memory...\n");

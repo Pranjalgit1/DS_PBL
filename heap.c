@@ -109,7 +109,6 @@ void heapify_up(MaxHeap* heap, HashMap* map, int index) {
     while (index > 0) {
         int parent = (index - 1) / 2;
         if (heap->array[index].freq > heap->array[parent].freq) {
-            // Update hashmap before swapping
             update_heap_index(map, heap->array[index].word, parent);
             update_heap_index(map, heap->array[parent].word, index);
             
@@ -136,7 +135,6 @@ void heapify_down(MaxHeap* heap, HashMap* map, int index) {
             largest = right;
         }
         if (largest != index) {
-            // Update hashmap before swapping
             update_heap_index(map, heap->array[index].word, largest);
             update_heap_index(map, heap->array[largest].word, index);
             
@@ -204,7 +202,6 @@ void get_top_searched_words(MaxHeap* heap, int n) {
     
     int count = (n < heap->size) ? n : heap->size;
     
-    
     HeapNode* temp = malloc(heap->size * sizeof(HeapNode));
     if (!temp) {
         printf("Memory allocation failed!\n");
@@ -214,9 +211,7 @@ void get_top_searched_words(MaxHeap* heap, int n) {
     memcpy(temp, heap->array, heap->size * sizeof(HeapNode));
     int temp_size = heap->size;
     
-    
     for (int i = 0; i < count; i++) {
-        // Find max in remaining elements
         int max_idx = 0;
         for (int j = 1; j < temp_size; j++) {
             if (temp[j].freq > temp[max_idx].freq) {
@@ -227,7 +222,6 @@ void get_top_searched_words(MaxHeap* heap, int n) {
         printf("%2d. %-20s (searched %d times)\n", 
                i + 1, temp[max_idx].word, temp[max_idx].freq);
         
-        // Remove this element by swapping with last
         temp[max_idx] = temp[temp_size - 1];
         temp_size--;
     }

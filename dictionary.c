@@ -15,7 +15,6 @@ static void to_lowercase(char *str) {
  MeaningNode *create_meaning_node( char *meaning) {
     MeaningNode *node = (MeaningNode *)malloc(sizeof(MeaningNode));
     if (!node) return NULL;
-    
     node->meaning = strdup(meaning);
     if (!node->meaning) {
         free(node);
@@ -212,7 +211,6 @@ static void save_trie_helper(TrieNode *node, char *prefix, int level, FILE *file
     if (node->is_end_of_word && node->word_entry) {
         prefix[level] = '\0';
         fprintf(file, "%s|", prefix);
-        
         MeaningNode *curr = node->word_entry->meanings_head;
         bool first = true;
         while (curr) {
@@ -223,7 +221,7 @@ static void save_trie_helper(TrieNode *node, char *prefix, int level, FILE *file
         }
         fprintf(file, "\n");
     }
-    // Recurse for all children
+    // Recursion for all children
     for (int i=0; i< ALPHABET_SIZE;i++) {
         if (node->children[i]) {
             prefix[level] = 'a' + i;
@@ -246,15 +244,11 @@ bool save_dictionary(TrieNode *root, char *filename) {
     return true;
 }
 
-// Heap integration functions
-
-// Track a word search in the heap
 void track_search(MaxHeap* heap, HashMap* map, const char* word) {
     if (!heap || !map || !word) return;
     increase_freq(heap, map, word, 1);
 }
 
-// Display top N most searched words
 void display_top_searched(MaxHeap* heap, int n) {
     if (!heap) return;
     get_top_searched_words(heap, n);

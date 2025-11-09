@@ -1,6 +1,5 @@
 #include "spellchecker.h"
 
-//function to find the minimum between insert , delete , replace
 int min(int a,int b,int c){
     int m = a < b ? a : b ;
     return m < c ? m : c;
@@ -14,7 +13,6 @@ int editdistance(char *s1,char *s2)
 
     int table[m+1][n+1];
 
-    //initializing first row and first column
     for(i=0;i<=m;i++)
     table[i][0]=i;
     for(j=0;j<=n;j++)
@@ -56,15 +54,12 @@ void run_spellchecker(char *input, const char *dict_file) {
     char line[256];
 
     while(fgets(line, sizeof(line), fp) != NULL && count < 3000){
-        //removing newline 
         line[strcspn(line,"\n")]=0;
         
-        //splitting
         char *wordn=NULL,*meaning=NULL;
         wordn=strtok(line,"|");
         meaning=strtok(NULL,"|");
         
-        //storing separately
         if(wordn && meaning){
             strcpy(d[count].word,wordn);
             strcpy(d[count].meaning,meaning);
@@ -96,7 +91,6 @@ void run_spellchecker(char *input, const char *dict_file) {
     free(d);
 }
 
-// GUI-friendly version that returns suggestion via parameters
 char* get_spellcheck_suggestion(char *input, const char *dict_file, char *suggestion_word, char *suggestion_meaning) {
     FILE *fp=NULL;
     fp=fopen(dict_file,"r");
@@ -115,15 +109,12 @@ char* get_spellcheck_suggestion(char *input, const char *dict_file, char *sugges
     char line[256];
 
     while(fgets(line, sizeof(line), fp) != NULL && count < 3000){
-        //removing newline 
         line[strcspn(line,"\n")]=0;
         
-        //splitting
         char *wordn=NULL,*meaning=NULL;
         wordn=strtok(line,"|");
         meaning=strtok(NULL,"|");
         
-        //storing separately
         if(wordn && meaning){
             strcpy(d[count].word,wordn);
             strcpy(d[count].meaning,meaning);
