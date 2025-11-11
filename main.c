@@ -11,9 +11,10 @@ void display_menu(void) {
     printf("========================================\n");
     printf("1. Search for a word\n");
     printf("2. Insert a new word\n");
-    printf("3. View top searched words\n");
-    printf("4. Save dictionary\n");
-    printf("5. Exit\n");
+    printf("3. Delete a word\n");
+    printf("4. View top searched words\n");
+    printf("5. Save dictionary\n");
+    printf("6. Exit\n");
     printf("========================================\n");
     printf("Enter your choice: ");
 }
@@ -84,6 +85,24 @@ int main(void) {
                 break;
                 
             case 3:
+                printf("\nEnter word to delete: ");
+                if (fgets(word, sizeof(word), stdin)) {
+                    word[strcspn(word, "\n")] = '\0';
+                    // First check if word exists
+                    WordEntry *entry = search_word(root, word);
+                    if (entry) {
+                        if (delete_word(root, word)) {
+                            printf("\n Word '%s' deleted successfully!\n", word);
+                        } else {
+                            printf("\n Failed to delete word.\n");
+                        }
+                    } else {
+                        printf("\n Word '%s' not found in dictionary. Cannot delete.\n", word);
+                    }
+                }
+                break;
+                
+            case 4:
                 printf("\nHow many top words do you want to see? (1-20): ");
                 int n;
                 if (scanf("%d", &n) == 1) {
@@ -98,7 +117,7 @@ int main(void) {
                 }
                 break;
                 
-            case 4:
+            case 5:
                 printf("\nSaving dictionary to '%s'...\n", dict_file);
                 if (save_dictionary(root, dict_file)) {
                     printf("Dictionary saved successfully!\n");
@@ -107,7 +126,7 @@ int main(void) {
                 }
                 break;
                 
-            case 5:
+            case 6:
                 printf("\nSaving dictionary before exit...\n");
                 save_dictionary(root, dict_file);
                 printf("\nCleaning up memory...\n");
@@ -117,7 +136,7 @@ int main(void) {
                 printf("Goodbye!\n\n");
                 return 0;
             default:
-                printf("invalid choice please select 1-5.\n");
+                printf("invalid choice please select 1-6.\n");
         }
     }
     

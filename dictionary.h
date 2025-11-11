@@ -24,6 +24,7 @@ typedef struct TrieNode {
 TrieNode *create_trienode(void);
 void free_trie(TrieNode *root);
 bool insert_word(TrieNode *root,  char *word,  char *meaning);
+bool delete_word(TrieNode *root,  char *word);
 bool load_dictionary(TrieNode *root,  char *filename);
 bool save_dictionary(TrieNode *root,  char *filename);
 WordEntry *search_word(TrieNode *root,  char *word);

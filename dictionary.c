@@ -140,6 +140,76 @@ WordEntry *search_word(TrieNode *root, char *word) {
     return NULL;
 }
 
+
+ bool has_children(TrieNode *node) {
+    if (!node) return false;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (node->children[i]) return true;
+    }
+    return false;
+}
+
+
+ bool delete_word(TrieNode *node, const char *word, int depth) {
+    if (!node) return false;
+    
+    // Base case
+    if (word[depth] == '\0') {
+        
+        if (!node->is_end_of_word) {
+            return false;
+        }
+        
+        if (node->word_entry) {
+            free_meanings(node->word_entry->meanings_head);
+            free(node->word_entry);
+            node->word_entry = NULL;
+        }
+        
+        node->is_end_of_word = false;
+        return !has_children(node);
+    }
+  
+    if (!isalpha((unsigned char)word[depth])) {
+        return delete_word(node, word, depth + 1);
+    }
+    
+    int index = tolower((unsigned char)word[depth]) - 'a';
+    if (index < 0 || index >= ALPHABET_SIZE) {
+        return false;
+    }
+    
+    TrieNode *child = node->children[index];
+    if (!child) {
+        return false; 
+    }
+    
+   
+    bool should_delete_child = delete_word(child, word, depth + 1);
+    
+    
+    if (should_delete_child) {
+        free(child);
+        node->children[index] = NULL;
+        
+        
+        return !node->is_end_of_word && !has_children(node);
+    }
+    
+    return false;
+}
+
+bool delete_word(TrieNode *root, char *word) {
+    if (!root || !word) return false;
+    char word_lower[MAX_LINE_LENGTH];
+    strncpy(word_lower, word, MAX_LINE_LENGTH - 1);
+    word_lower[MAX_LINE_LENGTH - 1] = '\0';
+    to_lowercase(word_lower);
+    delete_word(root, word_lower, 0);
+  
+    return true;
+}
+
 void print_word_meanings( char *word, WordEntry *entry) {
     if (!entry) return;
     printf("\n--- Word: %s ---\n", word);
